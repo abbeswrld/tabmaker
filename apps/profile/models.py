@@ -7,20 +7,26 @@ from django.core.mail import EmailMultiAlternatives
 from django.db import models
 from django.template import Context
 from django.template.loader import get_template
-from .bot_users  import BotUsers
+from apps.tournament.models.language import Language
+from apps.tournament.models.bot_users  import BotUsers
 
 class Country(models.Model):
+    class Meta:
+        app_label = 'profile' # Добавлено
     country_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=100)
 
 
 class City(models.Model):
+    class Meta:
+        app_label = 'profile' # Добавлено
     city_id = models.IntegerField(unique=True)
     name = models.CharField(max_length=100)
 
 
 class University(models.Model):
     class Meta:
+        app_label = 'profile' # Добавлено
         unique_together = ('country', 'city', 'university_id')
 
     country = models.ForeignKey(to=Country, on_delete=models.SET_NULL, null=True)
@@ -30,6 +36,9 @@ class University(models.Model):
 
 
 class User(AbstractUser):
+    class Meta:
+        app_label = 'profile' # Добавлено
+
     university = models.ForeignKey(to=University, null=True, on_delete=models.SET_NULL)
     phone = models.CharField(max_length=15)
     link = models.URLField(max_length=100, default='', blank=True)
@@ -37,7 +46,7 @@ class User(AbstractUser):
     adjudicator_experience = models.TextField(blank=True)
     is_show_phone = models.BooleanField(default=True)
     is_show_email = models.BooleanField(default=True)
-    telegram = models.ForeignKey(BotUsers, models.SET_NULL, null=True)
+    #telegram = models.ForeignKey(BotUsers, models.SET_NULL, null=True) #BotUsers - это не стандартная модель django, убедитесь что приложение и модель импортируется правильно
 
     def name(self):
         return "%s %s" % (self.first_name, self.last_name) \
@@ -112,16 +121,11 @@ class User(AbstractUser):
 
 
 class TelegramToken(models.Model):
+    class Meta:
+        app_label = 'profile' # Добавлено
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     value = models.TextField(max_length=64)
     expire = models.DateTimeField()
 
-    @staticmethod
-    def generate(user: User):
-        token = TelegramToken(
-            user=user,
-            expire=datetime.datetime.now() + datetime.timedelta(days=3),
-            value=(''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(30)))
-        )
-        token.save()
-        return token
+
+

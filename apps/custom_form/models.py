@@ -1,8 +1,8 @@
 from django.db import models
 
-from . round import Round
-from . profile import User
-from . tournament import Tournament
+from apps.tournament.models import Round
+from apps.profile.models import User
+from apps.tournament.models import Tournament
 
 import json
 

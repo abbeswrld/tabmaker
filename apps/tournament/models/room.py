@@ -1,7 +1,7 @@
 from django.db import models
 from . game import Game
-from . place import Place
-from . round import Round
+from apps.place.models import Place
+from apps.round.models import Round
 
 
 class Room(models.Model):

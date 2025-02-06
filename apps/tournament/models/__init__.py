@@ -18,7 +18,7 @@
 #
 #########################
 
-from . profile import \
+from apps.profile.models import \
     City, \
     Country, \
     University, \
@@ -27,7 +27,7 @@ from . profile import \
 
 from . language import Language
 from . motion import Motion
-from . team import Team
+from apps.team.models import Team
 from . game import \
     Game, \
     GameResult, \
@@ -41,14 +41,14 @@ from . tournament import \
     TournamentStatus, \
     UserTournamentRel
 
-from . place import Place
-from . round import Round
+from apps.place.models import Place
+from apps.round.models import Round
 from . room import Room
 from . page import \
     AccessToPage, \
     Page
 
-from .custom_form import \
+from apps.custom_form.models import \
     CustomForm, \
     CustomFieldAlias, \
     CustomFormAnswers, \

@@ -1,6 +1,6 @@
 from django.db import models
-from . motion import Motion
-from . tournament import Tournament
+from apps.tournament.models.motion import Motion
+from apps.tournament.models.tournament import Tournament
 
 
 class Round(models.Model):

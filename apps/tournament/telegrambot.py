@@ -3,7 +3,8 @@ from typing import Optional
 from telegram.ext import CommandHandler, CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django_telegrambot.apps import DjangoTelegramBot
-from . models import Motion, BotUsers, BotChat, Language, TelegramToken, User, Round, Room
+from . models import Motion, BotUsers, BotChat, Language, Round, Room
+from apps.profile.models import User, TelegramToken 
 
 import re
 import logging

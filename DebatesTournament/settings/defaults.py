@@ -17,6 +17,11 @@ INSTALLED_APPS = [
     'analytics',
     'apps.tester',
     'apps.tournament',
+    'apps.profile',
+    'apps.custom_form',
+    'apps.place',
+    'apps.round',
+    'apps.team',
 
     'allauth',
     'allauth.account',
@@ -25,7 +30,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.mailru',
     'allauth.socialaccount.providers.vk',
     'allauth.socialaccount.providers.facebook',
-
+    
     'modeltranslation',
 ]
 
@@ -57,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.common.BrokenLinkEmailsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'DebatesTournament.urls'
@@ -78,7 +84,7 @@ LANGUAGES = (
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'
 
-AUTH_USER_MODEL = 'tournament.User'
+AUTH_USER_MODEL = 'profile.User'
 
 WEBPACK_DEV_SERVER = os.getenv('WEBPACK_DEV_SERVER', None)
 

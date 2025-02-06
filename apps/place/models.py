@@ -1,5 +1,5 @@
 from django.db import models
-from . tournament import Tournament
+from apps.tournament.models.tournament import Tournament
 
 
 class Place(models.Model):
@@ -9,4 +9,3 @@ class Place(models.Model):
 
     def __str__(self):
         return self.place
-

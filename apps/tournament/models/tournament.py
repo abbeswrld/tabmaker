@@ -1,6 +1,6 @@
 from django.db import models
-from . profile import User
-from . team import Team
+from apps.profile.models import User
+from apps.team.models import Team
 
 
 class TournamentStatus(models.Model):
@@ -11,11 +11,11 @@ class TournamentStatus(models.Model):
 
 
 class TournamentRole(models.Model):
-    role = models.CharField(max_length=100)  # TODO rename to 'name'
+    role = models.CharField(max_length=100) 
+   
 
     def __str__(self):
         return self.role
-
 
 class Tournament(models.Model):
     name = models.CharField(max_length=100)
