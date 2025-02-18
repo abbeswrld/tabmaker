@@ -18,3 +18,36 @@
 
 {% endblock additional_block %}
 
+{% extends "tournament/registration_new.html" %}
+
+{% block page_title %}
+    Обратная связь на судью
+{% endblock %}
+
+{% block additional_block %}
+    <div class="section section__flex">
+        <h2>Обратная связь ({{ tournament.name }})</h2>
+
+        {% if form %}
+            <form method="post" action="{% url 'tournament:team_feedback' tournament=tournament %}">
+                {% csrf_token %}
+
+                <select name="round">
+                    {% for room in rooms %}
+                        <option value="{{ room.round.id }}" {% if room.round == last_round %}selected{% endif %}>
+                            Раунд №{{ room.round.number }} ({{ room.game.chair.name|default:"-" }})
+                        </option>
+                    {% endfor %}
+                </select>
+
+                {{ form.as_p }}
+
+                <button type="submit">{{ submit_title }}</button>
+            </form>
+        {% else %}
+            <p>Вы уже оставили отзыв для этого раунда.</p> 
+        {% endif %}
+
+    </div>
+{% endblock %}
+

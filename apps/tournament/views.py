@@ -267,12 +267,16 @@ def _get_or_check_round_result_forms(request, rooms, is_admin=False, is_playoff=
 ##################################
 #    Management of tournament    #
 ##################################
-
+from django.forms import formset_factory
 @login_required(login_url=reverse_lazy('account_login'))
 def new(request):
+    AdjudicatorFormSet = formset_factory(AdjudicatorForm, extra=3)
+
     if request.method == 'POST':
         tournament_form = TournamentForm(request.POST)
-        if tournament_form.is_valid():
+        adjudicator_formset = AdjudicatorFormSet(request.POST, prefix='adjudicators')
+
+        if tournament_form.is_valid() and adjudicator_formset.is_valid():
             tournament_obj = tournament_form.save(commit=False)
             tournament_obj.status = STATUS_REGISTRATION
             tournament_obj.save()
@@ -283,21 +287,71 @@ def new(request):
             )
 
             CustomForm.get_or_create(tournament_obj, FORM_REGISTRATION_TYPE)
-            CustomForm.get_or_create(tournament_obj, FORM_ADJUDICATOR_TYPE)
+
+            for adjudicator_form in adjudicator_formset:
+                if adjudicator_form.cleaned_data: 
+                    user = adjudicator_form.cleaned_data.get('user') 
+                    role = adjudicator_form.cleaned_data.get('role')
+                    if user and role: 
+                       UserTournamentRel.objects.create(
+                           user=user,
+                           tournament=tournament_obj,
+                           role=role
+                       )
 
             return redirect('tournament:created', tournament_id=tournament_obj.id)
-
     else:
         tournament_form = TournamentForm()
+        adjudicator_formset = AdjudicatorFormSet(prefix='adjudicators') # \
+
 
     return render(
         request,
         'tournament/new.html',
         {
             'form': tournament_form,
+            'adjudicator_form': adjudicator_form,
         }
     )
 
+def distribute_to_rooms(tournament):
+    teams = tournament.teamtournamentrel_set.filter(role=ROLE_MEMBER).select_related('team')
+    judges = tournament.usertournamentrel_set.filter(role__in=ADJUDICATOR_ROLES).select_related('user')
+    rooms = Room.objects.all()
+    current_round = Round.objects.create(tournament=tournament, number=1)
+
+    for room in rooms:
+        game = Game.objects.create(room=room, round=current_round)
+        for i in range(TEAM_IN_GAME):
+            try:
+                team = teams.pop()
+                if i == 0:
+                    game.og = team.team
+                elif i == 1:
+                    game.oo = team.team
+                elif i == 2:
+                    game.cg = team.team
+                elif i == 3:
+                    game.co = team.team
+            except IndexError:
+                break 
+
+        chair_judge = judges.filter(role=ROLE_CHAIR).first()
+        wing_judges = judges.filter(role__in=[ROLE_WING_LEFT, ROLE_WING_RIGHT])[:2] 
+
+
+        if chair_judge:
+            game.chair = chair_judge.user
+            judges = judges.exclude(pk=chair_judge.pk) 
+
+        for i, wing_judge in enumerate(wing_judges):
+            if i == 0:
+                game.wing_left = wing_judge.user
+            else:
+                game.wing_right = wing_judge.user
+            judges = judges.exclude(pk=wing_judge.pk)
+
+        game.save()
 
 @login_required(login_url=reverse_lazy('account_login'))
 @access_by_status(name_page='edit')
@@ -911,8 +965,6 @@ def change_owner(request, tournament):
     )
 
 
-
-
 # ================================ main
 
 def index(request):
@@ -954,6 +1006,10 @@ def team_feedback(request, tournament):
     if not rooms:
         return _show_message(request, MSG_USER_FEEDBACK_WITHOUT_ROUNDS)
 
+    last_round = rooms.last().round
+
+    if not check_last_round_results(tournament): 
+       return _show_message(request, 'Результаты раунда еще не внесены. Вы сможете оставить отзыв после их публикации.')
     custom_form = CustomForm.objects.filter(tournament=tournament, form_type=FORM_FEEDBACK_TYPE).first()
     questions = CustomQuestion.objects.filter(form=custom_form).select_related('alias').order_by('position') \
         if custom_form \
@@ -1002,5 +1058,6 @@ def team_feedback(request, tournament):
             'action_url': 'tournament:team_feedback',
             'form': feedback_form,
             'tournament': tournament,
+            'last_round': rooms.last().round,
         }
     )

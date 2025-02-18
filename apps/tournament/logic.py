@@ -456,16 +456,16 @@ def check_final(tournament: Tournament):
 
 def check_last_round_results(tournament: Tournament):
     # TODO use count .annotate(count_game=Count('game_id'), count_results=Count('game__gameresult__id')) \
-    rooms = Room.objects.filter(round=_get_last_round(tournament))\
-        .select_related('game')\
+    rooms = Room.objects.filter(round=_get_last_round(tournament)) \
+        .select_related('game') \
         .select_related('game__gameresult')
     for room in rooms:
         try:
             room.game.gameresult
         except AttributeError:
-            return 'Введите результаты последнего раунда'
+            return False
 
-    return None
+    return True
 
 
 def check_teams_and_adjudicators(tournament: Tournament):
