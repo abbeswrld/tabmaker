@@ -36,6 +36,21 @@ class GameResult(models.Model):
     @staticmethod
     def to_dict(team, place, s1, s2, rev):
         return {'team': team, 'place': place, 'speaker_1': s1, 'speaker_2': s2, 'revert': rev}
+    
+    def _is_fake_team(self, team):
+
+        return team.is_fake if hasattr(team, 'is_fake') else False
+
+    def _process_fake_result(self, team, result_data):
+        if self._is_fake_team(team):
+            if isinstance(result_data, int):
+                return 0
+            elif isinstance(result_data, bool):
+                return False
+        return result_data
+
+    class Meta:
+        abstract = True
 
 
 class QualificationResult(GameResult):
@@ -70,6 +85,26 @@ class QualificationResult(GameResult):
     ow = models.IntegerField()
     ow_exist = models.BooleanField(default=True)
 
+    def save(self, *args, **kwargs):
+        for position in ['og', 'oo', 'cg', 'co']:
+            team = getattr(self.game, position)
+            if self._is_fake_team(team):
+                setattr(self, position, 0)
+                if position == 'og':
+                    self.pm = self.dpm = 0
+                    self.pm_exist = self.dpm_exist = False
+                elif position == 'oo':
+                    self.lo = self.dlo = 0
+                    self.lo_exist = self.dlo_exist = False
+                elif position == 'cg':
+                    self.mg = self.gw = 0
+                    self.mg_exist = self.gw_exist = False
+                elif position == 'co':
+                    self.mo = self.ow = 0
+                    self.mo_exist = self.ow_exist = False
+        super().save(*args, **kwargs)
+
+
     def get_og_result(self):
         return self.to_dict(self.game.og, self.og, self.pm, self.dpm, self.og_rev)
 
@@ -89,6 +124,13 @@ class PlayoffResult(GameResult):
     oo = models.BooleanField()
     cg = models.BooleanField()
     co = models.BooleanField()
+
+    def save(self, *args, **kwargs):
+        for position in ['og', 'oo', 'cg', 'co']:
+            team = getattr(self.game, position)
+            if self._is_fake_team(team):
+                setattr(self, position, False)
+        super().save(*args, **kwargs)
 
     def get_og_result(self):
         return self.to_dict(self.game.og, self.og, 0, 0, self.og_rev)

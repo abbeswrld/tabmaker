@@ -7,6 +7,11 @@ class Team(models.Model):
     speaker_1 = models.ForeignKey(User, related_name='first_speaker', on_delete=models.SET_NULL, null=True)
     speaker_2 = models.ForeignKey(User, related_name='second_speaker', on_delete=models.SET_NULL, null=True)
     info = models.TextField(blank=True)
+    is_fake = models.BooleanField(default=False)
+
+    @property
+    def is_fake_team(self):
+        return self.is_fake
 
     def get_speakers(self) -> [User]:
         return [self.speaker_1, self.speaker_2]

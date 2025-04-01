@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django_telegrambot.apps import DjangoTelegramBot
 
 from apps.tournament.views import access_by_status, check_tournament, _show_message
-from apps.tournament.logic import 
+from apps.tournament.logic import
     generate_next_round, \
     get_rooms_from_last_round, \
     publish_last_round, \
@@ -25,9 +25,19 @@ def next_round(request, tournament):
         if motion_form.is_valid() and round_form.is_valid():
             round_obj = round_form.save(commit=False)
             round_obj.motion = motion_form.save()
-            error = generate_next_round(tournament, round_obj)
-            if error:
-                _show_message(request, error)
+            
+            round_obj.save()
+            
+            try:
+                from .services.room_distribution import create_games_for_round
+                create_games_for_round(round_obj)
+                
+                tournament.cur_round = round_obj.number
+                tournament.save()
+                
+            except Exception as e:
+                _show_message(request, f"Ошибка при создании комнат: {str(e)}")
+                return redirect('tournament:edit_round', tournament_id=tournament.id)
 
             return redirect('tournament:edit_round', tournament_id=tournament.id)
     else:
@@ -43,7 +53,6 @@ def next_round(request, tournament):
             'round_form': round_form,
         }
     )
-
 
 @access_by_status(name_page='round_show')
 def show_round(request, tournament):
