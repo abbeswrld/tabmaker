@@ -3,7 +3,7 @@ from django.db import models
 from apps.tournament.models import Round
 from apps.profile.models import User
 from apps.tournament.models import Tournament
-
+from apps.tournament.consts import CUSTOM_FIELD_SETS
 import json
 
 
@@ -21,7 +21,7 @@ class CustomForm(models.Model):
 
     @staticmethod
     def get_or_create(tournament: Tournament, form_type: CustomFormType):
-        from ..consts import CUSTOM_FIELD_SETS
+
 
         form = CustomForm.objects.get_or_create(tournament=tournament, form_type=form_type)
         if form[1] and form_type in CUSTOM_FIELD_SETS:  # is create

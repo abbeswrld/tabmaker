@@ -4,9 +4,9 @@ import logging
 
 from django.db.models import Q, Count
 from django.core.exceptions import ObjectDoesNotExist
-from .consts import *
-from .messages import *
-from .models import \
+from apps.tournament.consts import *
+from apps.tournament.messages import *
+from apps.tournament.models import \
     Tournament,\
     TeamTournamentRel, \
     Round, \

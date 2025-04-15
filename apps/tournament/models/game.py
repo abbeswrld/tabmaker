@@ -1,5 +1,5 @@
 from django.db import models
-from . motion import Motion
+from apps.tournament.models.motion import Motion
 from apps.profile.models import User
 from apps.team.models import Team
 
@@ -36,7 +36,7 @@ class GameResult(models.Model):
     @staticmethod
     def to_dict(team, place, s1, s2, rev):
         return {'team': team, 'place': place, 'speaker_1': s1, 'speaker_2': s2, 'revert': rev}
-    
+
     def _is_fake_team(self, team):
 
         return team.is_fake if hasattr(team, 'is_fake') else False

@@ -1,5 +1,5 @@
 from django.db import models
-from . tournament import TournamentStatus
+from apps.tournament.models.tournament import TournamentStatus
 
 
 class Page(models.Model):

@@ -1,4 +1,4 @@
-from . import BASE_DIR
+from DebatesTournament.settings.defaults import BASE_DIR
 import os
 
 STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static'))

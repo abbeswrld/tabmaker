@@ -1,19 +1,29 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
-from django_telegrambot.apps import DjangoTelegramBot
+import logging
+from apps.tournament.views import \
+    access_by_status, \
+    check_tournament, \
+     _show_message, \
+     _get_or_check_round_result_forms
 
-from apps.tournament.views import access_by_status, check_tournament, _show_message
-from apps.tournament.logic import
-    generate_next_round, \
+from apps.tournament.logic import \
     get_rooms_from_last_round, \
     publish_last_round, \
     get_tab, \
-    check_games_results_exists
+    check_games_results_exists,\
+    user_can_edit_tournament, \
+    STATUS_PLAYOFF, \
+    MSG_NO_ACCESS_IN_RESULT_PAGE, \
+    remove_last_round, \
+    MSG_NO_ROUND_IN_PLAYOFF_FOR_REMOVE, \
+    MSG_ROUND_NOT_EXIST
+
 from apps.tournament.messages import MSG_ROUND_NOT_PUBLIC
 from apps.tournament.forms import MotionForm, RoundForm, GameForm
 from apps.tournament.consts import ROLE_CHAIR, ROLE_CHIEF_ADJUDICATOR, ROLE_WING
-from apps.tournament.telegrambot import TabmakerBot
+from apps.round.services.room_distribution import create_games_for_round
 
 @login_required(login_url=reverse_lazy('account_login'))
 @access_by_status(name_page='round_next')
@@ -25,16 +35,15 @@ def next_round(request, tournament):
         if motion_form.is_valid() and round_form.is_valid():
             round_obj = round_form.save(commit=False)
             round_obj.motion = motion_form.save()
-            
+
             round_obj.save()
-            
+
             try:
-                from .services.room_distribution import create_games_for_round
                 create_games_for_round(round_obj)
-                
+
                 tournament.cur_round = round_obj.number
                 tournament.save()
-                
+
             except Exception as e:
                 _show_message(request, f"Ошибка при создании комнат: {str(e)}")
                 return redirect('tournament:edit_round', tournament_id=tournament.id)
@@ -92,7 +101,7 @@ def publish_round(request, tournament):
         return _show_message(request, exception)
 
     try:
-        from . telegrambot import TabmakerBot
+        from apps.tournament.telegrambot import TabmakerBot
         from django_telegrambot.apps import DjangoTelegramBot
 
         rooms = get_rooms_from_last_round(tournament)

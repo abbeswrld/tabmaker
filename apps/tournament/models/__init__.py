@@ -25,16 +25,17 @@ from apps.profile.models import \
     User, \
     TelegramToken
 
-from . language import Language
-from . motion import Motion
+
+from apps.tournament.models.language import Language
+from apps.tournament.models.motion import Motion
 from apps.team.models import Team
-from . game import \
+from apps.tournament.models.game import \
     Game, \
     GameResult, \
     PlayoffResult, \
     QualificationResult
 
-from . tournament import \
+from apps.tournament.models.tournament import \
     TeamTournamentRel, \
     Tournament, \
     TournamentRole, \
@@ -43,8 +44,8 @@ from . tournament import \
 
 from apps.place.models import Place
 from apps.round.models import Round
-from . room import Room
-from . page import \
+from apps.tournament.models.room import Room
+from apps.tournament.models.page import \
     AccessToPage, \
     Page
 
@@ -56,4 +57,4 @@ from apps.custom_form.models import \
     CustomQuestion, \
     FeedbackAnswer
 
-from . bot_users import BotChat, BotUsers
+from apps.tournament.models.bot_users import BotChat, BotUsers

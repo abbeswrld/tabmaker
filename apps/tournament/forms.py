@@ -1,6 +1,6 @@
 from django import forms
 from datetime import datetime
-from . models import \
+from apps.tournament.models import \
     Tournament, \
     Round
 
@@ -193,7 +193,7 @@ class СonfirmForm(forms.Form):
 # game.forms
 ########################################################################################
 
-from .models import \
+from apps.tournament.models import \
     Game, \
     PlayoffResult, \
     QualificationResult
@@ -344,7 +344,7 @@ class ActivateResultForm(forms.Form):
 # motion
 #######################################################################################################
 
-from .models import Motion
+from apps.tournament.models import Motion
 
 
 class MotionForm(forms.ModelForm):

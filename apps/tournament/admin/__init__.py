@@ -1,5 +1,5 @@
-from . motion import MotionAdmin
-from . tournament import TournamentAdmin
+from apps.tournament.admin.motion import MotionAdmin
+from apps.tournament.admin.tournament import TournamentAdmin
 from apps.tournament.models import Motion, Language, BotUsers, BotChat, Tournament
 from django.contrib.admin import site
 

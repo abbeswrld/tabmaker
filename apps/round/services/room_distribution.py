@@ -1,7 +1,6 @@
-from django.db.models import Q
 from apps.team.models import Team
 from apps.tournament.models import Game, Room
-from .utils import get_available_adjudicator, get_available_place
+from apps.round.services.utils import get_available_adjudicator, get_available_place
 
 
 def create_games_for_round(round_obj):
@@ -17,7 +16,7 @@ def create_games_for_round(round_obj):
 
     for i in range(0, len(all_teams), 4):
         teams_group = all_teams[i:i+4]
-        
+
         game = Game.objects.create(
             og=teams_group[0],
             oo=teams_group[1],
@@ -27,7 +26,7 @@ def create_games_for_round(round_obj):
             motion=round_obj.motion,
             date=round_obj.start_time,
         )
-        
+
         Room.objects.create(
             round=round_obj,
             game=game,

@@ -1,7 +1,7 @@
 from allauth.socialaccount.providers.oauth2.client import OAuth2Error
 from django.urls import reverse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
-from . models import User
+from apps.tournament.models import User
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):

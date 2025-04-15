@@ -6,15 +6,14 @@ from django.http import HttpResponse
 
 from apps.tournament.views import access_by_status, ajax_request, _show_message
 from apps.tournament.utils import json_response
-from apps.custom_forms.models import CustomForm, CustomQuestion, CustomFormAnswers
+from apps.custom_form.models import CustomForm, CustomQuestion, CustomFormAnswers
 from apps.tournament.consts import FORM_REGISTRATION_TYPE, ROLE_TEAM_REGISTERED, TEAM_ROLES, ROLE_MEMBER
-from apps.tournament.messages import 
+from apps.tournament.messages import \
     MSG_TEAM_SUCCESS_REGISTERED_pp, \
     MSG_JSON_OK, \
     MSG_JSON_BAD, \
     MSG_BAD_TEAM_ROLE, \
     MSG_TEAM_ROLE_CHANGE
-from .models import Team
 from apps.tournament.models.tournament import TeamTournamentRel, TournamentRole
 from apps.tournament.imports import TeamImportForm, ImportTeam
 from apps.tournament.logic import can_change_team_role
@@ -24,7 +23,7 @@ from apps.tournament.logic import can_change_team_role
 @login_required(login_url=reverse_lazy('account_login'))
 @access_by_status(name_page='team/adju. registration')
 def registration_team(request, tournament):
-    from .registration_forms import \
+    from apps.tournament.registration_forms import \
         CustomTeamRegistrationForm, \
         TeamWithSpeakerRegistrationForm
 
@@ -103,7 +102,7 @@ def add_team(request, tournament):
 @login_required(login_url=reverse_lazy('account_login'))
 @access_by_status(name_page='team/adju. add')
 def import_team(request, tournament):
-    
+
 
     message = ''
     results = []

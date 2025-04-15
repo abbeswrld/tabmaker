@@ -1,5 +1,5 @@
 from modeltranslation.translator import translator, TranslationOptions
-from .models import \
+from apps.tournament.models import \
     AccessToPage, \
     TournamentRole, \
     TournamentStatus

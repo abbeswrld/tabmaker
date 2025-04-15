@@ -1,6 +1,6 @@
 from enum import Enum
-from .messages import *
-from .models import \
+from apps.tournament.messages import *
+from apps.tournament.models import \
     CustomFormType, \
     CustomFieldAlias, \
     TournamentRole, \

@@ -4,10 +4,9 @@ from django import forms
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from oauth2client.service_account import ServiceAccountCredentials
-from .messages import *
-from .models import Tournament, User
-from .consts import ROLE_MEMBER
-from .models import Team
+from apps.tournament.messages import *
+from apps.tournament.models import Tournament, User, Team
+from apps.tournament.consts import ROLE_MEMBER
 
 
 class TeamImportForm(forms.Form):

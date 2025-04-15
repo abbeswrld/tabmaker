@@ -1,4 +1,4 @@
-from . import BASE_DIR
+from DebatesTournament.settings.defaults import BASE_DIR
 import os
 
 if os.getenv('DJANGO_LOG', 'OFF') == 'ON':

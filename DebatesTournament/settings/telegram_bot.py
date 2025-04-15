@@ -1,4 +1,4 @@
-from . defaults import INSTALLED_APPS
+from DebatesTournament.settings.defaults import INSTALLED_APPS
 import os
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', None)

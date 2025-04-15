@@ -1,5 +1,5 @@
 from django.db import models
-from . game import Game
+from apps.tournament.models.game import Game
 from apps.place.models import Place
 from apps.round.models import Round
 

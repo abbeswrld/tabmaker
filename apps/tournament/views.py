@@ -1,5 +1,4 @@
 import random
-import logging
 
 from datetime import date, timedelta
 
@@ -9,7 +8,7 @@ from datetime import date, timedelta
 # from apps.tournament.consts import *
 # from apps.tournament.models import Tournament
 # from apps.tournament.utils import paging
-
+from apps.round.models import Round
 from django.contrib.auth.decorators import login_required
 from django.db.models import Case, When, IntegerField
 from django.urls import \
@@ -27,28 +26,21 @@ from django.views.decorators.csrf import \
     csrf_protect, \
     ensure_csrf_cookie
 
-from .forms import EditForm
 
-from .utils import \
+from apps.tournament.utils import \
     json_response, \
     paging
 
-from .consts import *
-from .forms import \
+from apps.tournament.consts import *
+from apps.tournament.forms import \
     TournamentForm, \
     CheckboxForm, \
     СonfirmForm, \
-    RoundForm, \
-    ActivateResultForm, \
-    GameForm, \
-    MotionForm
-from .logic import \
-    can_change_team_role, \
-    check_games_results_exists, \
+    ActivateResultForm
+from apps.tournament.logic import \
     check_final, \
     check_last_round_results, \
     check_teams_and_adjudicators, \
-    generate_next_round, \
     generate_playoff, \
     get_all_rounds_and_rooms, \
     get_games_and_results, \
@@ -57,21 +49,24 @@ from .logic import \
     get_rooms_from_last_round, \
     get_tab, \
     get_teams_by_user, \
-    publish_last_round, \
-    remove_last_round, \
     remove_playoff, \
     user_can_edit_tournament
-from .messages import *
-from .models import \
+from apps.tournament.messages import *
+from apps.tournament.models import \
     AccessToPage, \
     Tournament, \
-    TeamTournamentRel, \
-    UserTournamentRel
-    
-from apps.profile.models import TelegramToken, User
+    UserTournamentRel, Room, Game
 
-from django.core.exceptions import ObjectDoesNotExist
+from apps.profile.models import  User
+
 from django.db.models import Count, Q
+
+from apps.tournament.models import \
+    CustomForm, \
+    CustomFormAnswers, \
+    CustomQuestion, \
+    FeedbackAnswer
+from apps.tournament.registration_forms import CustomFeedbackForm
 
 
 def access_by_status(name_page=None, only_owner=False):
@@ -230,7 +225,7 @@ def _convert_tab_to_speaker_table(table: list, is_show):
 
 
 def _get_or_check_round_result_forms(request, rooms, is_admin=False, is_playoff=False, is_final=False):
-    from .forms import \
+    from apps.tournament.forms import \
         FinalGameResultForm, \
         PlayoffGameResultForm, \
         QualificationGameResultForm
@@ -289,10 +284,10 @@ def new(request):
             CustomForm.get_or_create(tournament_obj, FORM_REGISTRATION_TYPE)
 
             for adjudicator_form in adjudicator_formset:
-                if adjudicator_form.cleaned_data: 
-                    user = adjudicator_form.cleaned_data.get('user') 
+                if adjudicator_form.cleaned_data:
+                    user = adjudicator_form.cleaned_data.get('user')
                     role = adjudicator_form.cleaned_data.get('role')
-                    if user and role: 
+                    if user and role:
                        UserTournamentRel.objects.create(
                            user=user,
                            tournament=tournament_obj,
@@ -334,15 +329,15 @@ def distribute_to_rooms(tournament):
                 elif i == 3:
                     game.co = team.team
             except IndexError:
-                break 
+                break
 
         chair_judge = judges.filter(role=ROLE_CHAIR).first()
-        wing_judges = judges.filter(role__in=[ROLE_WING_LEFT, ROLE_WING_RIGHT])[:2] 
+        wing_judges = judges.filter(role__in=[ROLE_WING_LEFT, ROLE_WING_RIGHT])[:2]
 
 
         if chair_judge:
             game.chair = chair_judge.user
-            judges = judges.exclude(pk=chair_judge.pk) 
+            judges = judges.exclude(pk=chair_judge.pk)
 
         for i, wing_judge in enumerate(wing_judges):
             if i == 0:
@@ -794,7 +789,7 @@ def _registration_adjudicator(tournament: Tournament, user: User):
 @login_required(login_url=reverse_lazy('account_login'))
 @access_by_status(name_page='team/adju. registration')
 def registration_adjudicator(request, tournament):
-    from .registration_forms import CustomAdjudicatorRegistrationForm
+    from apps.tournament.registration_forms import CustomAdjudicatorRegistrationForm
 
     custom_form = CustomForm.objects.filter(tournament=tournament, form_type=FORM_ADJUDICATOR_TYPE).first()
 
@@ -1008,7 +1003,7 @@ def team_feedback(request, tournament):
 
     last_round = rooms.last().round
 
-    if not check_last_round_results(tournament): 
+    if not check_last_round_results(tournament):
        return _show_message(request, 'Результаты раунда еще не внесены. Вы сможете оставить отзыв после их публикации.')
     custom_form = CustomForm.objects.filter(tournament=tournament, form_type=FORM_FEEDBACK_TYPE).first()
     questions = CustomQuestion.objects.filter(form=custom_form).select_related('alias').order_by('position') \

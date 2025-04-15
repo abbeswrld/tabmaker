@@ -1,5 +1,5 @@
 from django import template
-from ..consts import *
+from apps.tournament.consts import *
 
 
 register = template.Library()

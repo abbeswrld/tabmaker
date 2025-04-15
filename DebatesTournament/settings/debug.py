@@ -4,11 +4,11 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'OFF') == 'ON'
 DEBUG_TOOLBAR = os.getenv('DJANGO_DEBUG_TOOLBAR', 'OFF') == 'ON'
 
 if DEBUG_TOOLBAR:
-    from . defaults import INSTALLED_APPS, MIDDLEWARE
+    from DebatesTournament.settings.defaults import INSTALLED_APPS, MIDDLEWARE
 
     INSTALLED_APPS += [
         'debug_toolbar',
-        
+
     ]
 
     MIDDLEWARE += [

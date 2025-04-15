@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.db import ProgrammingError, OperationalError
 
 
 class TeamConfig(AppConfig):
@@ -7,7 +8,7 @@ class TeamConfig(AppConfig):
 
     def ready(self):
         try:
-            from .models import Team
+            from apps.team.models import Team
             if not Team.objects.filter(is_fake=True).exists():
                 Team.objects.get_or_create(
                     name="[FAKE] Dummy Team",

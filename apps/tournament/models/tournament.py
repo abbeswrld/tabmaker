@@ -11,8 +11,8 @@ class TournamentStatus(models.Model):
 
 
 class TournamentRole(models.Model):
-    role = models.CharField(max_length=100) 
-   
+    role = models.CharField(max_length=100)
+
 
     def __str__(self):
         return self.role
@@ -65,7 +65,7 @@ class Tournament(models.Model):
         return q.order_by('-role_id', '-id')
 
     def count_members(self):
-        from ..consts import ROLE_MEMBER
+        from apps.tournament.consts import ROLE_MEMBER
         return self.teamtournamentrel_set.filter(role=ROLE_MEMBER).count()
 
     def count_registered_teams(self):

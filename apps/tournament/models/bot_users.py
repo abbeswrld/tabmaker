@@ -1,5 +1,5 @@
 from django.db import models
-from . language import Language
+from apps.tournament.models.language import Language
 
 
 class BotUsers(models.Model):
